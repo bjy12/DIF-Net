@@ -1,0 +1,37 @@
+{   
+    "image": "./processed/{}.nii.gz",
+    "blocks": "./blocks/blocks.npy",
+    "image_block": "./blocks/{}/block_{}.npy",
+    "projections": "./projections_normalized/{}.pickle",
+    "projection_config": "./config.yaml",
+    "projection_norm": 0.10,
+    "train": [
+        "Without-1",
+        "Without-2",
+        "Without-3",
+        "Without-4",
+        "Without-5",
+        "Without-6",
+        "Without-7",
+        "Without-8",
+        "Without-9",
+        "Without-10",
+        "Without-11",
+        "Without-12",
+        "Without-13",
+        "Without-14",
+        "Without-15",
+        "Without-16",
+        "Without-23"      
+    ],
+    "eval": [
+        "Without-17",
+        "Without-18",
+        "Without-19"
+    ],
+    "test": [
+        "Without-20",
+        "Without-21",
+        "Without-22"
+    ]
+}

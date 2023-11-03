@@ -35,10 +35,11 @@ if __name__ == '__main__':
     blocks = np.stack(block_list, axis=0) # K, 3, N^3
     blocks = blocks.transpose(0, 2, 1).astype(float) / 255 # K, N^3, 3
     np.save('./blocks/blocks.npy', blocks)
-    
     files = glob(f'processed/*.nii.gz')
+    print("files " , files)
     for file in tqdm(files, ncols=50):
-        name = file.split('/')[-1].split('.')[0]
+        name = file.split('\\')[-1].split('.')[0]
+        print(" name : " , name)
         data_path = f'./processed/{name}.nii.gz'
         image = read_nifti(data_path)
 

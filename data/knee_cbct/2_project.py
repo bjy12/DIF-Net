@@ -63,6 +63,7 @@ class ConeGeometry_special(Geometry):
 
 
 def read_nifti(path):
+    print(" path " , path)
     itk_img = sitk.ReadImage(path)
     image = sitk.GetArrayFromImage(itk_img)
     return image
@@ -73,15 +74,16 @@ def save_nifti(image, path):
     sitk.WriteImage(out, path)
 
 
-def generate_data(ct_path, cfg_path, save_dir, visualize=False):
+def generate_data(ct_path, cfg_path, save_dir, visualize=True):
     # if os.path.exists(os.path.join(save_dir, 'all.pickle')):
     #     print(' -- skip', ct_path)
     #     return
-
+    #* 图像归一化
     image = read_nifti(ct_path).astype(np.float32) / 255.
-
+    
     with open(cfg_path, 'r') as f:
         data = yaml.safe_load(f)
+        print( " data " , data)
         data['image'] = image.copy()
 
     '''--- generate training data ---'''
@@ -104,6 +106,7 @@ def generate_data(ct_path, cfg_path, save_dir, visualize=False):
 
     '''--- save data ---'''
     if visualize:
+        #* input (save_dir , projectiongs , angles )
         save_projections(save_dir, data['train']['projections'], data['train']['angles'])
 
     save_path = os.path.join(save_dir, 'all.pickle')
@@ -116,13 +119,27 @@ def generate_data(ct_path, cfg_path, save_dir, visualize=False):
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    parser = argparse.ArgumentParser(description='project')
-    parser.add_argument('-n', '--name', type=str, default='FL-140400.nii.gz')
-    args = parser.parse_args()
-    
+    #parser = argparse.ArgumentParser(description='project')
+    #parser.add_argument('-n', '--name', type=str, default='FL-140400.nii.gz')
+    #parser.add_argument('-n', '--name', type=str, default='test_processed.nii.gz')
+    #args = parser.parse_args()
+    os.makedirs('.\projections' , exist_ok=True)
     cfg_path = os.path.join('./config.yaml')
-    name = args.name.replace('.nii.gz', '')
-    ct_path = f'./processed/{name}.nii.gz'
-    save_dir = os.path.join(f'./projections/{name}')
-    os.makedirs(save_dir, exist_ok=True)
-    generate_data(ct_path, cfg_path, save_dir, visualize=True)
+    #name = args.name.replace('.nii.gz', '')
+    #ct_path = f'./processed/{name}.nii.gz'
+    process_path = os.path.join('.\processed')
+    ct_files = os.listdir(process_path)
+    for file in ct_files:
+        process_ct_path = os.path.join(process_path ,file)
+        name = process_ct_path.split("\\")[-1].split(".")[0]
+        print("name : " , name)
+        print("process_ct_path" , process_ct_path)
+        save_dir = os.path.join(f'.\projections\{name}')
+        os.makedirs(save_dir , exist_ok= True)
+        generate_data(process_ct_path, cfg_path, save_dir, visualize=True)
+
+    
+    print( " ct_files : " , ct_files)
+    #save_dir = os.path.join(f'./projections/{name}')
+    #os.makedirs(save_dir, exist_ok=True)
+    #generate_data(ct_path, cfg_path, save_dir, visualize=True)

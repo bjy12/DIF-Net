@@ -97,12 +97,13 @@ class CBCT_dataset(Dataset):
             view_offset=0
         ):
         super().__init__()
-        dst_root = './data'
-        
+        dst_root = 'F:/Project/DIF-NET/DIF-Net/data'
+        print( " dst_name : " , dst_name)
         # load dataset info
         if dst_name in ['knee_cbct']:
             data_root = os.path.join(dst_root, dst_name)
-            with open(os.path.join(data_root, 'info.json'), 'r') as f:
+            #with open(os.path.join(data_root, 'info.json'), 'r') as f:
+            with open(os.path.join(data_root, 'info_copy.json') , 'r') as f:
                 cfg = json.load(f)
                 name_list = sorted(cfg[split])
                 print('CBCT_dataset, name: {}, split: {}, len: {}.'.format(dst_name, split, len(name_list)))
@@ -232,6 +233,6 @@ class CBCT_dataset(Dataset):
 
 
 if __name__ == '__main__':
-    dst = CBCT_dataset(dst_name='knee_zhao', random_views=True, num_views=10)
+    dst = CBCT_dataset(dst_name='knee_cbct', random_views=True, num_views=10)
     item = dst[0]
     import pdb; pdb.set_trace()
