@@ -68,7 +68,7 @@ if __name__ == '__main__':
     model = DIF_Net(
         num_views=args.num_views,
         combine=args.combine
-    ).cuda()
+    ).cuda(device="cuda:0")
     
     # -- initialize optimizer, lr scheduler, and loss function
     optimizer = torch.optim.SGD(
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         gamma=np.power(0.001, 1 / args.epoch)
     )
     loss_func = nn.MSELoss()
-
+    #writer = SummaryWriter("./logs/log")
     # -- training starts
     for epoch in range(args.epoch + 1):
         loss_list = []

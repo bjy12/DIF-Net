@@ -118,7 +118,7 @@ class CBCT_dataset(Dataset):
         with open(os.path.join(data_root, cfg['projection_config']), 'r') as f:
             print("proj_cfg_path : " , f)
             proj_cfg = yaml.safe_load(f)
-            print(" proj_cfg " , proj_cfg)
+            #print(" proj_cfg " , proj_cfg)
             self.geo = Geometry(proj_cfg)
 
         # prepare points
@@ -182,22 +182,25 @@ class CBCT_dataset(Dataset):
         return np.load(path)
 
     def sample_points(self, points, values=None):
+        #随机采样点在这些坐标值中
         choice = np.random.choice(len(points), size=self.npoint, replace=False)
         points = points[choice]
-        print( " choice poitns " , points)
+        #print( " choice poitns " , points)
         if values is not None:
             values = values[choice]
-            print(" value : " , values)
+            #print(" value : " , values)
             values = values.astype(float) / 255.
             return points, values
         else: return points
 
     def __getitem__(self, index):
+        #选中一个图像
         name = self.name_list[index]
-
+        #在一个图像投影中进行随机筛选
         # -- load projections
         projs, angles = self.sample_projections(name)
-
+        
+        #在一个图像的64个block中进行随机选取block
         # -- load sampling points
         if not self.is_train:
             points = self.points
@@ -205,12 +208,15 @@ class CBCT_dataset(Dataset):
             p_gt = np.zeros(len(points))
         else:
             b_idx = np.random.randint(len(self.blocks))
-            print(" len block " , len(self.blocks))
-            print(" b_idx : " , b_idx)
+            #print(" len block " , len(self.blocks))
+            #print(" b_idx : " , b_idx)
+            #获取block中的value值 亮度
             block_values = self.load_block(name, b_idx)
-            #print( " block_values  " , block_values )
+            #print( " block_values  " , block_values.shape )
+            #以及每个像素点的坐标值
             block_coords = self.blocks[b_idx] # N, 3
-            #print( " block_coords " , block_coords)
+            #print( " block_coords " , block_coords.shape)
+            # points 随机采样的店 p_gt是 所对应的value
             points, p_gt = self.sample_points(block_coords, block_values)
 
         # -- project points and view direction
