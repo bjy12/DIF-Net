@@ -18,6 +18,12 @@ def worker_init_fn(worker_id):
 
 
 if __name__ == '__main__':
+    #* name  logs/name
+    #* batch size 4
+    #* epoch 400
+    #* dis_list knee_cbct
+    #* n_view = 10 
+    #* combine mlp or maxpooling or avg 
     parser = argparse.ArgumentParser(description='train')
     parser = add_argument(parser)
     args = parser.parse_args()

@@ -26,11 +26,14 @@ class Geometry(object):
         # d_points: [N, 2] ranging from [-1, 1]
 
         points = deepcopy(points).astype(float)
+        #* points range [ 0,1 ] -----> [ -0.5 , 0.5]
         points[:, :2] -= 0.5 # [-0.5, 0.5]
         points[:, 2] = 0.5 - points[:, 2] # [-0.5, 0.5]
+
         points *= self.v_res * self.v_spacing # mm
 
         angle = -1 * angle # inverse direction
+        #* rotation with x 
         rot_M = np.array([
             [np.cos(angle), -np.sin(angle), 0],
             [np.sin(angle),  np.cos(angle), 0],
@@ -111,14 +114,18 @@ class CBCT_dataset(Dataset):
             raise ValueError(dst_name)
 
         # load projection config
+        #* 读取projectiong_config 
         with open(os.path.join(data_root, cfg['projection_config']), 'r') as f:
+            print("proj_cfg_path : " , f)
             proj_cfg = yaml.safe_load(f)
+            print(" proj_cfg " , proj_cfg)
             self.geo = Geometry(proj_cfg)
 
         # prepare points
         if split == 'train':
             # load blocks' coordinates [train only]
             self.blocks = np.load(os.path.join(data_root, cfg['blocks']))
+            print("block " , self.blocks.shape)
         else:
             # prepare sampling points
             points = np.mgrid[:out_res, :out_res, :out_res]
@@ -177,8 +184,10 @@ class CBCT_dataset(Dataset):
     def sample_points(self, points, values=None):
         choice = np.random.choice(len(points), size=self.npoint, replace=False)
         points = points[choice]
+        print( " choice poitns " , points)
         if values is not None:
             values = values[choice]
+            print(" value : " , values)
             values = values.astype(float) / 255.
             return points, values
         else: return points
@@ -196,8 +205,12 @@ class CBCT_dataset(Dataset):
             p_gt = np.zeros(len(points))
         else:
             b_idx = np.random.randint(len(self.blocks))
+            print(" len block " , len(self.blocks))
+            print(" b_idx : " , b_idx)
             block_values = self.load_block(name, b_idx)
+            #print( " block_values  " , block_values )
             block_coords = self.blocks[b_idx] # N, 3
+            #print( " block_coords " , block_coords)
             points, p_gt = self.sample_points(block_coords, block_values)
 
         # -- project points and view direction
@@ -235,4 +248,5 @@ class CBCT_dataset(Dataset):
 if __name__ == '__main__':
     dst = CBCT_dataset(dst_name='knee_cbct', random_views=True, num_views=10)
     item = dst[0]
-    import pdb; pdb.set_trace()
+    print( " item : " , item.keys())
+    #import pdb; pdb.set_trace()
